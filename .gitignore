@@ -129,4 +129,5 @@ dmypy.json
 .pyre/
 
 # Chalice
-.chalice/config.json
+.chalice
+!.chalice/example.config.json

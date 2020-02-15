@@ -8,7 +8,7 @@ BUCKET_NAME = os.environ.get("BUCKET_NAME")
 
 app = Chalice(app_name="LaPPI")
 env = Environment(
-    loader=PackageLoader("app", "templates"),
+    loader=PackageLoader("app", "chalicelib/templates"),
     autoescape=select_autoescape(["html", "xml"]),
 )
 s3_client = boto3.client("s3")
