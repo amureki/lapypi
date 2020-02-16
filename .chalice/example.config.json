@@ -1,6 +1,6 @@
 {
   "version": "2.0",
-  "app_name": "lappi",
+  "app_name": "lapypi",
   "autogen_policy": false,
   "stages": {
     "dev": {

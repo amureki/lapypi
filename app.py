@@ -7,7 +7,7 @@ from jinja2 import Environment, PackageLoader, select_autoescape
 S3_BUCKET_NAME = os.environ.get("BUCKET_NAME")
 
 # chalice
-app = Chalice(app_name="LaPPI")
+app = Chalice(app_name="lapypi")
 # jinja2
 env = Environment(
     loader=PackageLoader("app", "chalicelib/templates"),
