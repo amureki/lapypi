@@ -28,8 +28,15 @@ def get_presigned_url(key):
     return url
 
 
-@app.route("/", methods=["GET"])
+@app.route("/", methods=["GET", "POST"])
 def simple():
+    request = app.current_request
+    if request.method == "POST":
+        body = request.raw_body
+        package_name = "test-package"
+        s3_client.upload_fileobj(body, S3_BUCKET_NAME, package_name)
+        return Response(body="")
+
     template = env.get_template("simple.html")
     s3_root_objects = s3_client.list_objects_v2(Bucket=S3_BUCKET_NAME, Delimiter="/")
     package_list = [obj["Prefix"] for obj in s3_root_objects["CommonPrefixes"]]
