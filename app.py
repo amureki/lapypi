@@ -20,10 +20,10 @@ s3_client = boto3.client("s3")
 def get_presigned_url(key):
     """Generate short-lived URL for getting the package."""
     url = s3_client.generate_presigned_url(
-        'get_object',
+        "get_object",
         ExpiresIn=300,
-        Params={'Bucket': S3_BUCKET_NAME, 'Key': key},
-        HttpMethod='GET',
+        Params={"Bucket": S3_BUCKET_NAME, "Key": key},
+        HttpMethod="GET",
     )
     return url
 
