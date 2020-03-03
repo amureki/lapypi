@@ -1,4 +1,6 @@
 import os
+import cgi
+from io import BytesIO
 
 import boto3
 from chalice import Chalice, Response, NotFoundError
@@ -17,6 +19,15 @@ env = Environment(
 s3_client = boto3.client("s3")
 
 
+def _get_parts(raw_body):
+    raw_file = BytesIO(raw_body)
+    content_type = app.current_request.headers["content-type"]
+    _, parameters = cgi.parse_header(content_type)
+    parameters["boundary"] = parameters["boundary"].encode("utf-8")
+    parsed = cgi.parse_multipart(raw_file, parameters)
+    return parsed
+
+
 def get_presigned_url(key):
     """Generate short-lived URL for getting the package."""
     url = s3_client.generate_presigned_url(
@@ -28,13 +39,21 @@ def get_presigned_url(key):
     return url
 
 
-@app.route("/", methods=["GET", "POST"])
+@app.route(
+    "/",
+    methods=["GET", "POST"],
+    content_types=["application/json", "multipart/form-data"],
+)
 def simple():
     request = app.current_request
     if request.method == "POST":
-        body = request.raw_body
-        package_name = "test-package"
-        s3_client.upload_fileobj(body, S3_BUCKET_NAME, package_name)
+        data = _get_parts(request.raw_body)
+        content = data["content"]
+        name = data["name"][0].decode("utf-8")
+        version = data["version"][0].decode("utf-8")
+        name_with_version = f"{name}-{version}.tar.gz"
+        stream = BytesIO(content[0])
+        s3_client.upload_fileobj(stream, S3_BUCKET_NAME, f"{name}/{name_with_version}")
         return Response(body="")
 
     template = env.get_template("simple.html")
@@ -62,7 +81,7 @@ def package(package_name):
     items = [(href, name) for href, name in zip(urls, names)]
 
     # drop S3 folder element
-    if items:
+    if names[0] == "":
         del items[0]
 
     return Response(
