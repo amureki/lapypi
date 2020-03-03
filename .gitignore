@@ -131,3 +131,4 @@ dmypy.json
 # Chalice
 .chalice
 !.chalice/example.config.json
+!.chalice/example.policy.json
